@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'providers/auth_provider.dart';
+import 'providers/peminjaman_provider.dart';
 import 'screens/detail_screen.dart';
 import 'screens/home_shell.dart';
 import 'screens/login_screen.dart';
 
-void main() => runApp(const PustakaKitaApp());
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PeminjamanProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: const PustakaKitaApp(),
+    ),
+  );
+}
 
 class PustakaKitaApp extends StatelessWidget {
   const PustakaKitaApp({super.key});
