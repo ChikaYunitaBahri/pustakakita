@@ -14,9 +14,9 @@ class BukuException implements Exception {
 }
 
 class BukuService {
-  // Label kategori (tampil di aplikasi) -> pencarian Google Books
+  // Label kategori (tampil di aplikasi) -> query pencarian Open Library
   static const Map<String, String> kategoriQuery = {
-    'Teknologi': 'subject:computers',
+    'Teknologi': 'subject:programming',
     'Novel': 'subject:fiction',
     'Sains': 'subject:science',
     'Bisnis': 'subject:business',
@@ -29,28 +29,38 @@ class BukuService {
     String? kategori,
     int maxResults = 20,
   }) async {
-    final uri = Uri.https('www.googleapis.com', '/books/v1/volumes', {
+    final uri = Uri.https('openlibrary.org', '/search.json', {
       'q': kataKunci,
-      'maxResults': '$maxResults',
-      'printType': 'books',
+      'limit': '$maxResults',
+      'fields': 'key,title,author_name,cover_i',
     });
 
     try {
-      final res = await http.get(uri).timeout(const Duration(seconds: 10));
+      final res = await http.get(uri, headers: {
+        'User-Agent': 'PustakaKita/1.0 (tugas kuliah UNTAN)',
+      }).timeout(const Duration(seconds: 15));
 
+      if (res.statusCode == 429) {
+        throw BukuException(
+          'Batas permintaan tercapai (status 429). Coba lagi beberapa saat.',
+        );
+      }
       if (res.statusCode != 200) {
         throw BukuException('Server mengembalikan status ${res.statusCode}.');
       }
 
       final body = jsonDecode(res.body) as Map<String, dynamic>;
-      final items = (body['items'] as List?) ?? [];
+      final docs = (body['docs'] as List?) ?? [];
 
-      if (items.isEmpty) {
+      if (docs.isEmpty) {
         throw BukuException('Data buku kosong.');
       }
 
-      return items
-          .map((e) => Buku.fromJson(e as Map<String, dynamic>, kategori: kategori))
+      return docs
+          .map((e) => Buku.fromOpenLibrary(
+                e as Map<String, dynamic>,
+                kategori: kategori,
+              ))
           .toList();
     } on BukuException {
       rethrow;

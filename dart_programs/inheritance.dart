@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 class Buku {
   final String judul;
   final String penulis;
