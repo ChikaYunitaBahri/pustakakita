@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 void main() {
   final perKategori = <String, List<String>>{
     'Novel': ['Laskar Pelangi', 'Bumi Manusia'],

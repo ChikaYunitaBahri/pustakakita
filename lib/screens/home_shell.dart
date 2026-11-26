@@ -37,7 +37,7 @@ class _HomeShellState extends State<HomeShell> {
           BottomNavigationBarItem(
             icon: Selector<PeminjamanProvider, int>(
               selector: (_, p) => p.jumlah,
-              builder: (_, jumlah, __) => Badge(
+              builder: (_, jumlah, _) => Badge(
                 isLabelVisible: jumlah > 0,
                 label: Text('$jumlah'),
                 child: const Icon(Icons.bookmark),

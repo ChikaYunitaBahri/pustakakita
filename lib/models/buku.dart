@@ -26,4 +26,21 @@ class Buku {
       gambar: (v['imageLinks']?['thumbnail'])?.toString(),
     );
   }
+
+    factory Buku.fromOpenLibrary(Map<String, dynamic> json, {String? kategori}) {
+    final penulis = json['author_name'] as List?;
+    final coverId = json['cover_i'];
+    final key = (json['key'] ?? '').toString();
+    return Buku(
+      id: key.replaceAll('/works/', ''),
+      judul: (json['title'] ?? 'Tanpa judul').toString(),
+      penulis: (penulis == null || penulis.isEmpty)
+          ? 'Penulis tidak diketahui'
+          : penulis.take(2).join(', '),
+      kategori: kategori ?? 'Umum',
+      gambar: coverId == null
+          ? null
+          : 'https://covers.openlibrary.org/b/id/$coverId-M.jpg',
+    );
+  }
 }
