@@ -7,6 +7,7 @@ class FavoritProvider extends ChangeNotifier {
   FavoritProvider(this._box);
 
   List<String> get ids => _box.keys.map((e) => e.toString()).toList();
+
   bool isFavorit(Buku buku) => _box.containsKey(buku.id);
 
   Future<void> toggle(Buku buku) async {
