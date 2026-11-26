@@ -7,6 +7,7 @@ import 'providers/peminjaman_provider.dart';
 import 'screens/detail_screen.dart';
 import 'screens/home_shell.dart';
 import 'screens/login_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(
@@ -29,7 +30,7 @@ class PustakaKitaApp extends StatelessWidget {
     return MaterialApp(
       title: 'PustakaKita',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
+      theme: AppTheme.terang,
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeShell(),
