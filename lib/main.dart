@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/auth_provider.dart';
+import 'providers/buku_provider.dart';
 import 'providers/peminjaman_provider.dart';
 import 'screens/detail_screen.dart';
 import 'screens/home_shell.dart';
@@ -13,6 +14,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => PeminjamanProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => BukuProvider()..muat()),
       ],
       child: const PustakaKitaApp(),
     ),
