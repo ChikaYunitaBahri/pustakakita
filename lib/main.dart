@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'screens/demo_setstate_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/buku_provider.dart';
 import 'providers/peminjaman_provider.dart';
@@ -35,6 +35,7 @@ class PustakaKitaApp extends StatelessWidget {
         '/': (context) => const HomeShell(),
         '/detail': (context) => const DetailScreen(),
         '/login': (context) => const LoginScreen(),
+        '/demo-setstate': (context) => const DemoSetStateScreen(),
       },
     );
   }
