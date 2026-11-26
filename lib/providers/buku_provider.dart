@@ -16,13 +16,17 @@ class BukuProvider extends ChangeNotifier {
   String? get error => _error;
   List<Buku> get data => List.unmodifiable(_data);
 
-  Future<void> muat([String kataKunci = 'pemrograman']) async {
+  /// Daftar kategori yang ada di data (untuk filter)
+  List<String> get daftarKategori =>
+      (_data.map((b) => b.kategori).toSet().toList()..sort());
+
+  Future<void> muat() async {
     _loading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _data = await _service.ambilBuku(kataKunci);
+      _data = await _service.ambilBukuBeragam();
     } on BukuException catch (e) {
       _error = e.pesan;
       _data = [];
