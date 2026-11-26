@@ -1,0 +1,18 @@
+name: pustakakita
+description: Aplikasi pustakakita
+publish_to: none
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  device_info_plus: ^11.5.0
+  flutter_local_notifications: ^19.5.0
+  permission_handler: ^12.0.1
+  provider: ^6.1.5
+  timezone: ^0.10.1
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
