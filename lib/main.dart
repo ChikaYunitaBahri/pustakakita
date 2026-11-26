@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'screens/demo_setstate_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/buku_provider.dart';
@@ -13,9 +15,15 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => PeminjamanProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => BukuProvider()..muat()),
+        ChangeNotifierProvider(
+          create: (_) => PeminjamanProvider()..muat(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => BukuProvider()..muat(),
+        ),
       ],
       child: const PustakaKitaApp(),
     ),
