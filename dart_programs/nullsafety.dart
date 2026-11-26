@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 String? cariBuku(List<String> daftar, String kata) {
   for (final judul in daftar) {
     if (judul.toLowerCase().contains(kata.toLowerCase())) {
