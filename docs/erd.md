@@ -1,4 +1,6 @@
-# ERD PustakaKita
+
+hari_terlambat = max(0, tanggal_kembali_aktual - tanggal_jatuh_tempo)   (dalam hari)
+denda          = hari_terlambat x tarif_per_hari# ERD PustakaKita
 
 ```mermaid
 erDiagram
