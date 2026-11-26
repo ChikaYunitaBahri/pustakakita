@@ -1,0 +1,19 @@
+﻿00:00 +0: loading C:/Users/User/Documents/pustakakita/test/buku_test.dart
+00:00 +0: fromJson memetakan field dengan benar
+00:00 +1: field kosong memakai nilai default
+00:00 +1 -1: field kosong memakai nilai default [E]
+  type '_Map<dynamic, dynamic>' is not a subtype of type 'Map<String, dynamic>' in type cast
+  package:pustakakita/models/buku.dart 17:42  new Buku.fromJson
+  test\buku_test.dart 21:20                   main.<fn>
+  
+00:00 +1 -1: kategori dari luar menimpa kategori API
+00:00 +1 -2: kategori dari luar menimpa kategori API [E]
+  type '_Map<dynamic, dynamic>' is not a subtype of type 'Map<String, dynamic>' in type cast
+  package:pustakakita/models/buku.dart 17:42  new Buku.fromJson
+  test\buku_test.dart 28:20                   main.<fn>
+  
+00:00 +1 -2: Some tests failed.
+
+Failing tests:
+  C:/Users/User/Documents/pustakakita/test/buku_test.dart: field kosong memakai nilai default
+  C:/Users/User/Documents/pustakakita/test/buku_test.dart: kategori dari luar menimpa kategori API
