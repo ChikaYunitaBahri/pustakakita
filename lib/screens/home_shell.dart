@@ -28,11 +28,21 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final temaNavigasi = Theme.of(context).bottomNavigationBarTheme;
+
     return Scaffold(
       body: _pages[_index],
+
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: temaNavigasi.backgroundColor,
+        selectedItemColor: temaNavigasi.selectedItemColor,
+        unselectedItemColor: temaNavigasi.unselectedItemColor,
+        type: BottomNavigationBarType.fixed,
+        elevation: temaNavigasi.elevation ?? 8,
+
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
+
         items: [
           const BottomNavigationBarItem(
             icon: Icon(Icons.menu_book),
