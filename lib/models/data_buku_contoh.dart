@@ -1,6 +1,6 @@
 import '../models/buku.dart';
 
-/// Data contoh (12 buku) untuk List<Buku>.
+/// Contoh penggunaan `List<Buku>`
 /// Hanya memakai 4 field dasar: id, judul, penulis, kategori.
 final List<Buku> daftarBukuContoh = [
   Buku(id: '1', judul: 'Flutter Dasar', penulis: 'Tim A', kategori: 'Teknologi'),

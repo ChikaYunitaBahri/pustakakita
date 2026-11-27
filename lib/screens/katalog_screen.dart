@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/buku.dart';
 import '../providers/buku_provider.dart';
+import '../providers/favorit_provider.dart';
 
 class KatalogScreen extends StatefulWidget {
   const KatalogScreen({super.key});
@@ -167,6 +168,8 @@ class _KartuBuku extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
+    final favoritProvider = context.watch<FavoritProvider>();
+    final sudahFavorit = favoritProvider.isFavorit(buku);
 
     // Android memblokir gambar http, jadi diubah ke https.
     final url = buku.gambar?.replaceFirst('http://', 'https://');
@@ -191,6 +194,7 @@ class _KartuBuku extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
+                  // Gambar sampul buku
                   url == null
                       ? pengganti
                       : Image.network(
@@ -199,6 +203,8 @@ class _KartuBuku extends StatelessWidget {
                           errorBuilder: (context, error, stackTrace) =>
                               pengganti,
                         ),
+
+                  // Label kategori
                   Positioned(
                     left: 6,
                     right: 6,
@@ -225,9 +231,36 @@ class _KartuBuku extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                  // Tombol Favorit
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Material(
+                      color: tema.colorScheme.surface.withAlpha(230),
+                      shape: const CircleBorder(),
+                      child: IconButton(
+                        tooltip: sudahFavorit
+                            ? 'Hapus dari favorit'
+                            : 'Tambah ke favorit',
+                        visualDensity: VisualDensity.compact,
+                        icon: Icon(
+                          sudahFavorit
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: sudahFavorit ? Colors.red : null,
+                        ),
+                        onPressed: () {
+                          context.read<FavoritProvider>().toggle(buku);
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
+
+            // Informasi buku
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
