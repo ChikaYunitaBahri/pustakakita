@@ -1,0 +1,15 @@
+00:00 +0: loading C:/src/pustakakita/test/buku_test.dart
+00:00 +0: C:/src/pustakakita/test/buku_test.dart: fromJson memetakan field dengan benar
+00:00 +1: C:/src/pustakakita/test/buku_test.dart: field kosong memakai nilai default
+00:00 +2: C:/src/pustakakita/test/buku_test.dart: kategori dari luar menimpa kategori API
+00:00 +3: C:/src/pustakakita/test/buku_test.dart: Buku.fromOpenLibrary (format Open Library) memetakan field dengan benar
+00:00 +4: C:/src/pustakakita/test/buku_test.dart: Buku.fromOpenLibrary (format Open Library) field kosong memakai nilai default
+00:00 +5: C:/src/pustakakita/test/buku_test.dart: Buku.fromOpenLibrary (format Open Library) hanya mengambil dua penulis pertama
+00:00 +6: C:/src/pustakakita/test/login_widget_test.dart: menekan Masuk dengan kolom kosong menampilkan pesan error
+00:00 +7: C:/src/pustakakita/test/login_widget_test.dart: menekan Masuk dengan kolom kosong menampilkan pesan error
+00:00 +8: C:/src/pustakakita/test/login_widget_test.dart: menekan Masuk dengan kolom kosong menampilkan pesan error
+00:00 +9: C:/src/pustakakita/test/login_widget_test.dart: menekan Masuk dengan kolom kosong menampilkan pesan error
+00:00 +10: C:/src/pustakakita/test/login_widget_test.dart: menekan Masuk dengan kolom kosong menampilkan pesan error
+00:00 +11: C:/src/pustakakita/test/login_widget_test.dart: menekan Masuk dengan kolom kosong menampilkan pesan error
+00:01 +12: C:/src/pustakakita/test/login_widget_test.dart: email dengan format salah menampilkan pesan format
+00:01 +13: All tests passed!
