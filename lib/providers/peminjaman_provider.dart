@@ -4,11 +4,13 @@ import 'package:flutter/foundation.dart';
 import '../data/db_helper.dart';
 import '../models/buku.dart';
 import '../models/peminjaman.dart';
+import '../services/notifikasi_service.dart';
 
 class PeminjamanProvider extends ChangeNotifier {
   PeminjamanProvider({DbHelper? db}) : _db = db ?? DbHelper.instance;
 
   final DbHelper _db;
+  final NotifikasiService _notifikasi = NotifikasiService.instance;
 
   List<Peminjaman> _semua = [];
 
@@ -74,8 +76,27 @@ class PeminjamanProvider extends ChangeNotifier {
         status: 'dipinjam',
       );
 
-      await _db.tambah(peminjamanBaru);
+      // 1. Simpan peminjaman ke database
+      final idPeminjaman = await _db.tambah(peminjamanBaru);
 
+      // 2. Tampilkan notifikasi konfirmasi
+      await _notifikasi.tampilkan(
+        id: 1000000 + idPeminjaman,
+        judul: 'Peminjaman Berhasil',
+        isi: 'Kamu berhasil meminjam buku "${b.judul}".',
+      );
+
+      // 3. Jadwalkan pengingat satu hari sebelum jatuh tempo
+      await _notifikasi.jadwalkan(
+        id: idPeminjaman,
+        judul: 'Pengingat Pengembalian Buku',
+        isi:
+            'Buku "${b.judul}" akan jatuh tempo besok. Jangan lupa dikembalikan!',
+        waktu: peminjamanBaru.tglJatuhTempo
+            .subtract(const Duration(days: 1)),
+      );
+
+      // 4. Muat ulang data
       await muat();
       return true;
     } catch (e) {
@@ -100,11 +121,16 @@ class PeminjamanProvider extends ChangeNotifier {
         return false;
       }
 
+      // 1. Update status peminjaman di database
       await _db.ubah(p.id!, {
         'status': 'kembali',
         'tgl_kembali': DateTime.now().toIso8601String(),
       });
 
+      // 2. Batalkan pengingat jatuh tempo
+      await _notifikasi.batalkan(p.id!);
+
+      // 3. Muat ulang data
       await muat();
       return true;
     } catch (e) {
@@ -139,10 +165,24 @@ class PeminjamanProvider extends ChangeNotifier {
 
       final jatuhTempoBaru = dasar.add(const Duration(days: 7));
 
+      // 1. Update tanggal jatuh tempo di database
       await _db.ubah(p.id!, {
         'tgl_jatuh_tempo': jatuhTempoBaru.toIso8601String(),
       });
 
+      // 2. Batalkan pengingat lama
+      await _notifikasi.batalkan(p.id!);
+
+      // 3. Jadwalkan pengingat baru H-1
+      await _notifikasi.jadwalkan(
+        id: p.id!,
+        judul: 'Pengingat Pengembalian Buku',
+        isi:
+            'Buku "${p.judul}" akan jatuh tempo besok. Jangan lupa dikembalikan!',
+        waktu: jatuhTempoBaru.subtract(const Duration(days: 1)),
+      );
+
+      // 4. Muat ulang data
       await muat();
       return true;
     } catch (e) {
@@ -161,8 +201,13 @@ class PeminjamanProvider extends ChangeNotifier {
         return false;
       }
 
+      // 1. Batalkan pengingat jika masih ada
+      await _notifikasi.batalkan(p.id!);
+
+      // 2. Hapus data dari database
       await _db.hapus(p.id!);
 
+      // 3. Muat ulang data
       await muat();
       return true;
     } catch (e) {
