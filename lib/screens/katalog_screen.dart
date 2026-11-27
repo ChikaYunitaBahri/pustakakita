@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,11 +32,13 @@ class _KatalogScreenState extends State<KatalogScreen> {
     final kata = _kata.trim().toLowerCase();
     final hasil = provider.data.where((b) {
       final cocokJudul = b.judul.toLowerCase().contains(kata);
-      final cocokKategori = _kategori == _semua || b.kategori == _kategori;
+      final cocokKategori =
+          _kategori == _semua || b.kategori == _kategori;
       return cocokJudul && cocokKategori;
     }).toList();
 
-    final daftarChip = <String>{_semua, ...provider.daftarKategori}.toList();
+    final daftarChip =
+        <String>{_semua, ...provider.daftarKategori}.toList();
 
     Widget isi;
     if (provider.loading) {
@@ -47,7 +50,10 @@ class _KatalogScreenState extends State<KatalogScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(provider.error!, textAlign: TextAlign.center),
+              Text(
+                provider.error!,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: () => context.read<BukuProvider>().muat(),
@@ -64,7 +70,9 @@ class _KatalogScreenState extends State<KatalogScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Katalog PustakaKita')),
+      appBar: AppBar(
+        title: const Text('Katalog PustakaKita'),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -103,7 +111,8 @@ class _KatalogScreenState extends State<KatalogScreen> {
                       child: ChoiceChip(
                         label: Text(k),
                         selected: _kategori == k,
-                        onSelected: (_) => setState(() => _kategori = k),
+                        onSelected: (_) =>
+                            setState(() => _kategori = k),
                       ),
                     ),
                 ],
@@ -130,8 +139,9 @@ class _GridBuku extends StatelessWidget {
         final kolom = batas.maxWidth < 600
             ? 2
             : batas.maxWidth < 900
-            ? 3
-            : 5;
+                ? 3
+                : 5;
+
         return GridView.builder(
           padding: const EdgeInsets.all(12),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -141,7 +151,8 @@ class _GridBuku extends StatelessWidget {
             childAspectRatio: 0.62,
           ),
           itemCount: daftar.length,
-          itemBuilder: (context, i) => _KartuBuku(buku: daftar[i]),
+          itemBuilder: (context, i) =>
+              _KartuBuku(buku: daftar[i]),
         );
       },
     );
@@ -156,8 +167,10 @@ class _KartuBuku extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
+
     // Android memblokir gambar http, jadi diubah ke https.
     final url = buku.gambar?.replaceFirst('http://', 'https://');
+
     final pengganti = Container(
       color: tema.colorScheme.surfaceContainerHighest,
       child: const Icon(Icons.menu_book, size: 48),
@@ -166,8 +179,11 @@ class _KartuBuku extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () =>
-            Navigator.pushNamed(context, '/detail', arguments: buku),
+        onTap: () => Navigator.pushNamed(
+          context,
+          '/detail',
+          arguments: buku,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -180,7 +196,8 @@ class _KartuBuku extends StatelessWidget {
                       : Image.network(
                           url,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => pengganti,
+                          errorBuilder: (context, error, stackTrace) =>
+                              pengganti,
                         ),
                   Positioned(
                     left: 6,
