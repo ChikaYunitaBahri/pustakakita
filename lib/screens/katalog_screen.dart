@@ -1,11 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/buku.dart';
 import '../providers/buku_provider.dart';
 import '../providers/favorit_provider.dart';
-import 'notifikasi_screen.dart';
+import '../services/notifikasi_service.dart';
+import 'daftar_notifikasi_screen.dart';
 
 class KatalogScreen extends StatefulWidget {
   const KatalogScreen({super.key});
@@ -18,8 +18,17 @@ class _KatalogScreenState extends State<KatalogScreen> {
   static const String _semua = 'Semua';
 
   final _pencarian = TextEditingController();
+
   String _kata = '';
   String _kategori = _semua;
+
+  int _jumlahBelumDibaca = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _muatBadgeNotifikasi();
+  }
 
   @override
   void dispose() {
@@ -27,13 +36,62 @@ class _KatalogScreenState extends State<KatalogScreen> {
     super.dispose();
   }
 
-  // Membuka halaman pengaturan notifikasi
-  void _bukaNotifikasi() {
-    Navigator.push(
+  // Memuat jumlah notifikasi yang belum dibaca.
+  Future<void> _muatBadgeNotifikasi() async {
+    final jumlah = await NotifikasiService.instance.jumlahBelumDibaca();
+
+    if (!mounted) return;
+
+    setState(() {
+      _jumlahBelumDibaca = jumlah;
+    });
+  }
+
+  // Membuka halaman daftar notifikasi.
+  // Badge diperbarui setelah pengguna kembali ke katalog.
+  Future<void> _bukaNotifikasi() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const NotifikasiScreen(),
+        builder: (_) => const DaftarNotifikasiScreen(),
       ),
+    );
+
+    await _muatBadgeNotifikasi();
+  }
+
+  // Widget ikon lonceng beserta badge.
+  Widget _ikonNotifikasi() {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        const Icon(Icons.notifications_outlined),
+        if (_jumlahBelumDibaca > 0)
+          Positioned(
+            right: -6,
+            top: -6,
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              constraints: const BoxConstraints(
+                minWidth: 17,
+                minHeight: 17,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                _jumlahBelumDibaca > 99 ? '99+' : '$_jumlahBelumDibaca',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -42,19 +100,23 @@ class _KatalogScreenState extends State<KatalogScreen> {
     final provider = context.watch<BukuProvider>();
 
     final kata = _kata.trim().toLowerCase();
+
     final hasil = provider.data.where((b) {
       final cocokJudul = b.judul.toLowerCase().contains(kata);
-      final cocokKategori =
-          _kategori == _semua || b.kategori == _kategori;
+
+      final cocokKategori = _kategori == _semua || b.kategori == _kategori;
+
       return cocokJudul && cocokKategori;
     }).toList();
 
-    final daftarChip =
-        <String>{_semua, ...provider.daftarKategori}.toList();
+    final daftarChip = <String>{_semua, ...provider.daftarKategori}.toList();
 
     Widget isi;
+
     if (provider.loading) {
-      isi = const Center(child: CircularProgressIndicator());
+      isi = const Center(
+        child: CircularProgressIndicator(),
+      );
     } else if (provider.error != null) {
       isi = Center(
         child: Padding(
@@ -76,7 +138,9 @@ class _KatalogScreenState extends State<KatalogScreen> {
         ),
       );
     } else if (hasil.isEmpty) {
-      isi = const Center(child: Text('Buku tidak ditemukan'));
+      isi = const Center(
+        child: Text('Buku tidak ditemukan'),
+      );
     } else {
       isi = _GridBuku(daftar: hasil);
     }
@@ -84,12 +148,10 @@ class _KatalogScreenState extends State<KatalogScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Katalog PustakaKita'),
-
-        // Icon notifikasi di kanan AppBar
         actions: [
           IconButton(
             tooltip: 'Notifikasi',
-            icon: const Icon(Icons.notifications_outlined),
+            icon: _ikonNotifikasi(),
             onPressed: _bukaNotifikasi,
           ),
         ],
@@ -97,11 +159,14 @@ class _KatalogScreenState extends State<KatalogScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Pencarian buku.
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
               child: TextField(
                 controller: _pencarian,
-                onChanged: (nilai) => setState(() => _kata = nilai),
+                onChanged: (nilai) {
+                  setState(() => _kata = nilai);
+                },
                 decoration: InputDecoration(
                   hintText: 'Cari judul buku',
                   prefixIcon: const Icon(Icons.search),
@@ -122,7 +187,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
               ),
             ),
 
-            // Filter kategori
+            // Filter kategori.
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -134,15 +199,16 @@ class _KatalogScreenState extends State<KatalogScreen> {
                       child: ChoiceChip(
                         label: Text(k),
                         selected: _kategori == k,
-                        onSelected: (_) =>
-                            setState(() => _kategori = k),
+                        onSelected: (_) {
+                          setState(() => _kategori = k);
+                        },
                       ),
                     ),
                 ],
               ),
             ),
 
-            // Daftar buku
+            // Daftar buku.
             Expanded(child: isi),
           ],
         ),
@@ -150,6 +216,10 @@ class _KatalogScreenState extends State<KatalogScreen> {
     );
   }
 }
+
+// ==================================================
+// GRID BUKU
+// ==================================================
 
 class _GridBuku extends StatelessWidget {
   const _GridBuku({required this.daftar});
@@ -176,13 +246,18 @@ class _GridBuku extends StatelessWidget {
             childAspectRatio: 0.62,
           ),
           itemCount: daftar.length,
-          itemBuilder: (context, i) =>
-              _KartuBuku(buku: daftar[i]),
+          itemBuilder: (context, i) {
+            return _KartuBuku(buku: daftar[i]);
+          },
         );
       },
     );
   }
 }
+
+// ==================================================
+// KARTU BUKU
+// ==================================================
 
 class _KartuBuku extends StatelessWidget {
   const _KartuBuku({required this.buku});
@@ -192,10 +267,11 @@ class _KartuBuku extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
+
     final favoritProvider = context.watch<FavoritProvider>();
     final sudahFavorit = favoritProvider.isFavorit(buku);
 
-    // Android memblokir gambar http, jadi diubah ke https.
+    // Android memblokir gambar HTTP, jadi diubah ke HTTPS.
     final url = buku.gambar?.replaceFirst('http://', 'https://');
 
     final pengganti = Container(
@@ -218,17 +294,18 @@ class _KartuBuku extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Gambar sampul buku
+                  // Gambar sampul buku.
                   url == null
                       ? pengganti
                       : Image.network(
                           url,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              pengganti,
+                          errorBuilder: (context, error, stackTrace) {
+                            return pengganti;
+                          },
                         ),
 
-                  // Label kategori
+                  // Label kategori.
                   Positioned(
                     left: 6,
                     right: 6,
@@ -256,7 +333,7 @@ class _KartuBuku extends StatelessWidget {
                     ),
                   ),
 
-                  // Tombol Favorit
+                  // Tombol favorit.
                   Positioned(
                     top: 6,
                     right: 6,
@@ -269,9 +346,7 @@ class _KartuBuku extends StatelessWidget {
                             : 'Tambah ke favorit',
                         visualDensity: VisualDensity.compact,
                         icon: Icon(
-                          sudahFavorit
-                              ? Icons.favorite
-                              : Icons.favorite_border,
+                          sudahFavorit ? Icons.favorite : Icons.favorite_border,
                           color: sudahFavorit ? Colors.red : null,
                         ),
                         onPressed: () {
@@ -284,7 +359,7 @@ class _KartuBuku extends StatelessWidget {
               ),
             ),
 
-            // Informasi buku
+            // Informasi buku.
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
