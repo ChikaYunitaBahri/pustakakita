@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart';
 import '../services/auth_php_api.dart';
 
 /// Halaman setelah login berhasil: data akun dan tombol logout.
@@ -8,12 +10,7 @@ class AkunPhpScreen extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      await AuthPhpApi.logout();
-    } on AuthPhpException catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(e.pesan)));
-    }
+    await context.read<AuthProvider>().logout();
     navigator.pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
