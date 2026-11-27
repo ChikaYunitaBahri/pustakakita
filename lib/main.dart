@@ -1,23 +1,26 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
+import 'screens/auth_gate.dart';
 import 'screens/demo_setstate_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/buku_provider.dart';
 import 'providers/favorit_provider.dart';
 import 'providers/peminjaman_provider.dart';
 import 'screens/detail_screen.dart';
-import 'screens/home_shell.dart';
-import 'screens/login_screen.dart';
+import 'screens/login_php_screen.dart';
+import 'screens/register_php_screen.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi Hive
-  await Hive.initFlutter();
+  // Inisialisasi Hive di folder data aplikasi (bukan folder Documents)
+  final dir = await getApplicationSupportDirectory();
+  await dir.create(recursive: true);
+  Hive.init(dir.path);
 
   // Membuka box untuk menyimpan data favorit
   await Hive.openBox('favorit');
@@ -29,7 +32,7 @@ Future<void> main() async {
           create: (_) => PeminjamanProvider()..muat(),
         ),
         ChangeNotifierProvider(
-          create: (_) => AuthProvider(),
+          create: (_) => AuthProvider()..muat(),
         ),
         ChangeNotifierProvider(
           create: (_) => BukuProvider()..muat(),
@@ -54,9 +57,10 @@ class PustakaKitaApp extends StatelessWidget {
       theme: AppTheme.terang,
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeShell(),
+        '/': (context) => const AuthGate(),
         '/detail': (context) => const DetailScreen(),
-        '/login': (context) => const LoginScreen(),
+        '/login': (context) => const LoginPhpScreen(),
+        '/register': (context) => const RegisterPhpScreen(),
         '/demo-setstate': (context) => const DemoSetStateScreen(),
       },
     );

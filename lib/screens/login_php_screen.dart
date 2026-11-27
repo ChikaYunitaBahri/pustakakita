@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart';
 import '../services/auth_php_api.dart';
 
 class LoginPhpScreen extends StatefulWidget {
@@ -39,11 +41,13 @@ class _LoginPhpScreenState extends State<LoginPhpScreen> {
 
   Future<void> _masuk() async {
     if (!_formKey.currentState!.validate()) return;
+    final auth = context.read<AuthProvider>();
+    final navigator = Navigator.of(context);
     setState(() => _loading = true);
     try {
-      await AuthPhpApi.login(_emailCtrl.text.trim(), _passCtrl.text);
+      await auth.login(_emailCtrl.text.trim(), _passCtrl.text);
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/akun', (route) => false);
+      navigator.pushNamedAndRemoveUntil('/', (route) => false);
     } on AuthPhpException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
