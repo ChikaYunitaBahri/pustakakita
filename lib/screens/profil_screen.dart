@@ -1,7 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
+import 'notifikasi_screen.dart';
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});
@@ -17,6 +20,15 @@ class ProfilScreen extends StatelessWidget {
         ),
       );
     }
+  }
+
+  void _bukaNotifikasi(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const NotifikasiScreen(),
+      ),
+    );
   }
 
   @override
@@ -51,8 +63,7 @@ class ProfilScreen extends StatelessWidget {
                 ),
 
                 // Email pengguna
-                if (auth.email != null)
-                  Text(auth.email!),
+                if (auth.email != null) Text(auth.email!),
 
                 const SizedBox(height: 16),
 
@@ -81,13 +92,13 @@ class ProfilScreen extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                // Pengaturan tampilan
+                // Pengaturan
                 Card(
                   child: Column(
                     children: [
                       const ListTile(
                         leading: Icon(Icons.settings_outlined),
-                        title: Text('Pengaturan Tampilan'),
+                        title: Text('Pengaturan'),
                       ),
 
                       // Pengaturan Dark Mode
@@ -103,6 +114,21 @@ class ProfilScreen extends StatelessWidget {
                         onChanged: (nilai) {
                           themeProvider.ubah(nilai);
                         },
+                      ),
+
+                      const Divider(height: 1),
+
+                      // Pengaturan Notifikasi
+                      ListTile(
+                        leading: const Icon(
+                          Icons.notifications_active_outlined,
+                        ),
+                        title: const Text('Pengaturan Notifikasi'),
+                        subtitle: const Text(
+                          'Tes dan kelola notifikasi aplikasi',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => _bukaNotifikasi(context),
                       ),
                     ],
                   ),

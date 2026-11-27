@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/buku.dart';
 import '../providers/buku_provider.dart';
 import '../providers/favorit_provider.dart';
+import 'notifikasi_screen.dart';
 
 class KatalogScreen extends StatefulWidget {
   const KatalogScreen({super.key});
@@ -24,6 +25,16 @@ class _KatalogScreenState extends State<KatalogScreen> {
   void dispose() {
     _pencarian.dispose();
     super.dispose();
+  }
+
+  // Membuka halaman pengaturan notifikasi
+  void _bukaNotifikasi() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const NotifikasiScreen(),
+      ),
+    );
   }
 
   @override
@@ -73,6 +84,15 @@ class _KatalogScreenState extends State<KatalogScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Katalog PustakaKita'),
+
+        // Icon notifikasi di kanan AppBar
+        actions: [
+          IconButton(
+            tooltip: 'Notifikasi',
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: _bukaNotifikasi,
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -101,6 +121,8 @@ class _KatalogScreenState extends State<KatalogScreen> {
                 ),
               ),
             ),
+
+            // Filter kategori
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -119,6 +141,8 @@ class _KatalogScreenState extends State<KatalogScreen> {
                 ],
               ),
             ),
+
+            // Daftar buku
             Expanded(child: isi),
           ],
         ),
