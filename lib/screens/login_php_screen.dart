@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../services/auth_php_api.dart';
+import '../utils/validator.dart';
 
 class LoginPhpScreen extends StatefulWidget {
   const LoginPhpScreen({super.key});
@@ -23,20 +24,6 @@ class _LoginPhpScreenState extends State<LoginPhpScreen> {
     _emailCtrl.dispose();
     _passCtrl.dispose();
     super.dispose();
-  }
-
-  String? _validasiEmail(String? v) {
-    final teks = v?.trim() ?? '';
-    if (teks.isEmpty) return 'Email wajib diisi';
-    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(teks)) {
-      return 'Format email tidak valid';
-    }
-    return null;
-  }
-
-  String? _validasiPassword(String? v) {
-    if (v == null || v.isEmpty) return 'Password wajib diisi';
-    return null;
   }
 
   Future<void> _masuk() async {
@@ -92,7 +79,7 @@ class _LoginPhpScreenState extends State<LoginPhpScreen> {
                         controller: _emailCtrl,
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
-                        validator: _validasiEmail,
+                        validator: Validator.email,
                         decoration: const InputDecoration(
                           labelText: 'Email',
                           prefixIcon: Icon(Icons.email),
@@ -105,7 +92,7 @@ class _LoginPhpScreenState extends State<LoginPhpScreen> {
                         obscureText: _sembunyikan,
                         textInputAction: TextInputAction.done,
                         onFieldSubmitted: (_) => _masuk(),
-                        validator: _validasiPassword,
+                        validator: Validator.password,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           prefixIcon: const Icon(Icons.lock),
