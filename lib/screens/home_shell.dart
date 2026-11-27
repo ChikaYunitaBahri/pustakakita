@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,13 +31,22 @@ class _HomeShellState extends State<HomeShell> {
 
     return Scaffold(
       body: _pages[_index],
-
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: temaNavigasi.backgroundColor,
         selectedItemColor: temaNavigasi.selectedItemColor,
         unselectedItemColor: temaNavigasi.unselectedItemColor,
         type: BottomNavigationBarType.fixed,
         elevation: temaNavigasi.elevation ?? 8,
+
+        // Perbaikan ukuran label agar tidak terpotong
+        selectedFontSize: 11,
+        unselectedFontSize: 11,
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w400,
+        ),
 
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
