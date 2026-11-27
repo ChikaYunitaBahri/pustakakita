@@ -10,6 +10,8 @@ erDiagram
         string nama
         string email UK
         string password_hash
+        string token_hash "boleh kosong"
+        timestamp dibuat_pada
     }
     books {
         string id PK
@@ -34,6 +36,14 @@ erDiagram
 
 - Satu user dapat memiliki banyak peminjaman (1 ke N).
 - Satu buku dapat tercatat di banyak peminjaman (1 ke N).
+
+## Catatan Kolom Tabel `users`
+
+| Kolom | Keterangan |
+|---|---|
+| `password_hash` | Hasil `password_hash()` PHP (bcrypt, berawalan `$2y$`). Password asli tidak pernah disimpan. |
+| `token_hash` | Hash SHA-256 dari token sesi. Diisi saat login dan dikosongkan (`NULL`) saat logout. Token asli hanya dikirim ke aplikasi. |
+| `dibuat_pada` | Waktu akun dibuat, terisi otomatis oleh MySQL. |
 
 ## Aturan Denda Keterlambatan
 
@@ -62,7 +72,7 @@ Contoh: jatuh tempo 10 Des, dikembalikan 14 Des, maka terlambat 4 hari dan denda
 | `books` | **MySQL** (server) | Sumber data utama katalog, termasuk `stok` |
 | `loans` | **MySQL** (server) | Data transaksi peminjaman harus konsisten antar perangkat |
 | Salinan `books` dan `loans` | **SQLite** (lokal) | Cache supaya katalog dan riwayat tetap bisa dibuka saat offline |
-| Sesi login (id user, token) | **Hive** (lokal) | Key-value sederhana dan cepat |
+| Sesi login (token di perangkat) | **Hive** (lokal) | Key-value sederhana dan cepat; server hanya menyimpan hash token di `users.token_hash` |
 | Buku favorit | **Hive** (lokal) | Data kecil per perangkat |
 | Preferensi (filter kategori terakhir, dll.) | **Hive** (lokal) | Pengaturan ringan |
 
