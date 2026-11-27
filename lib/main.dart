@@ -9,6 +9,7 @@ import 'providers/auth_provider.dart';
 import 'providers/buku_provider.dart';
 import 'providers/favorit_provider.dart';
 import 'providers/peminjaman_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/detail_screen.dart';
 import 'screens/login_php_screen.dart';
 import 'screens/register_php_screen.dart';
@@ -40,6 +41,9 @@ Future<void> main() async {
         ChangeNotifierProvider(
           create: (_) => FavoritProvider(Hive.box('favorit')),
         ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider()..muat(),
+        ),
       ],
       child: const PustakaKitaApp(),
     ),
@@ -51,10 +55,14 @@ class PustakaKitaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+
     return MaterialApp(
       title: 'PustakaKita',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.terang,
+      darkTheme: AppTheme.gelap,
+      themeMode: themeProvider.mode,
       initialRoute: '/',
       routes: {
         '/': (context) => const AuthGate(),
