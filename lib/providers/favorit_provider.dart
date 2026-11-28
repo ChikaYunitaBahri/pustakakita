@@ -25,8 +25,13 @@ class FavoritProvider extends ChangeNotifier {
 
   /// Semua buku favorit. Data di Hive berupa Map, jadi diubah kembali
   /// menjadi objek Buku. Dipakai oleh halaman Favorit dan badge di tab.
-  List<Buku> get semua => _box.values
-      .whereType<Map>()
-      .map((m) => Buku.fromMap(m))
-      .toList();
+  List<Buku> get semua {
+    final hasil = <Buku>[];
+    for (final nilai in _box.values) {
+      if (nilai is Map) {
+        hasil.add(Buku.fromMap(nilai));
+      }
+    }
+    return hasil;
+  }
 }
