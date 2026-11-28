@@ -1,8 +1,11 @@
+
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'firebase_options.dart';
 import 'screens/auth_gate.dart';
 import 'screens/demo_setstate_screen.dart';
 import 'providers/auth_provider.dart';
@@ -18,7 +21,12 @@ import 'theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi Hive di folder data aplikasi (bukan folder Documents)
+  // Inisialisasi Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Inisialisasi Hive di folder data aplikasi
   final dir = await getApplicationSupportDirectory();
   await dir.create(recursive: true);
   Hive.init(dir.path);

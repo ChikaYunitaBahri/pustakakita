@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1072052885852",
+    "project_id": "pustakakita-03",
+    "storage_bucket": "pustakakita-03.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072052885852:android:97ae4ec09102e018714999",
+        "android_client_info": {
+          "package_name": "com.example.pustakakita"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb1H58TUcv17huRHrkr10KRaC3PRZy0cc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
