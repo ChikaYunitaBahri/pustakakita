@@ -1,7 +1,5 @@
-import 'dart:convert';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 class AuthPhpException implements Exception {
   final String pesan;
@@ -19,11 +17,10 @@ class AkunPhp {
   AkunPhp({required this.nama, required this.email, required this.token});
 }
 
-/// Memanggil backend PHP: register.php, login.php, logout.php.
-/// Format balasan backend: { "sukses": bool, "pesan": "...", "data": {...} }
+/// Autentikasi memakai Firebase Authentication.
+/// Nama kelas dipertahankan agar halaman yang sudah ada tetap berjalan.
 class AuthPhpApi {
-  /// Chrome/Windows memakai localhost. Emulator Android memakai 10.0.2.2.
-  /// Sesuaikan nama folder jika backend ditaruh di folder lain pada htdocs.
+  /// Masih disediakan untuk fitur lain yang belum dipindahkan dari PHP.
   static String get baseUrl {
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       return 'http://10.0.2.2/pustakakita_api';
@@ -33,65 +30,84 @@ class AuthPhpApi {
 
   static AkunPhp? akun;
 
-  static Future<Map<String, dynamic>> _post(
-    String file,
-    Map<String, dynamic> body,
-  ) async {
-    http.Response res;
-    try {
-      res = await http
-          .post(
-            Uri.parse('$baseUrl/$file'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 10));
-    } catch (_) {
-      throw AuthPhpException(
-        'Tidak dapat terhubung ke server. Pastikan Apache dan MySQL di XAMPP menyala.',
-      );
-    }
-
-    Map<String, dynamic> data;
-    try {
-      data = jsonDecode(res.body) as Map<String, dynamic>;
-    } catch (_) {
-      throw AuthPhpException(
-        'Balasan server tidak dikenali (kode ${res.statusCode}). '
-        'Periksa alamat backend: $baseUrl/$file',
-      );
-    }
-
-    if (data['sukses'] == true) return data;
-    throw AuthPhpException(
-      (data['pesan'] ?? 'Terjadi kesalahan (${res.statusCode})').toString(),
-    );
-  }
+  static FirebaseAuth get _auth => FirebaseAuth.instance;
 
   static Future<void> register(
       String nama, String email, String password) async {
-    await _post('register.php',
-        {'nama': nama, 'email': email, 'password': password});
+    try {
+      final hasil = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      await hasil.user?.updateDisplayName(nama.trim());
+      // Setelah daftar, pengguna login sendiri seperti versi sebelumnya.
+      await _auth.signOut();
+    } on FirebaseAuthException catch (e) {
+      throw AuthPhpException(_pesanError(e));
+    }
   }
 
   static Future<AkunPhp> login(String email, String password) async {
-    final data =
-        await _post('login.php', {'email': email, 'password': password});
-    final isi = data['data'] as Map<String, dynamic>;
-    akun = AkunPhp(
-      nama: isi['nama'].toString(),
-      email: isi['email'].toString(),
-      token: isi['token'].toString(),
-    );
-    return akun!;
+    try {
+      final hasil = await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      akun = await _akunDari(hasil.user!);
+      return akun!;
+    } on FirebaseAuthException catch (e) {
+      throw AuthPhpException(_pesanError(e));
+    }
+  }
+
+  /// Memulihkan sesi yang disimpan otomatis oleh Firebase.
+  static Future<AkunPhp?> pulihkan() async {
+    final user = await _auth.authStateChanges().first;
+    akun = user == null ? null : await _akunDari(user);
+    return akun;
   }
 
   static Future<void> logout() async {
-    final token = akun?.token;
+    await _auth.signOut();
+    akun = null;
+  }
+
+  static Future<AkunPhp> _akunDari(User user) async {
+    var token = '';
     try {
-      if (token != null) await _post('logout.php', {'token': token});
-    } finally {
-      akun = null;
+      token = await user.getIdToken() ?? '';
+    } catch (_) {
+      // Token gagal diambil, misalnya saat tidak ada internet.
+    }
+    final email = user.email ?? '';
+    final nama = user.displayName;
+    return AkunPhp(
+      nama: nama == null || nama.isEmpty ? email.split('@').first : nama,
+      email: email,
+      token: token,
+    );
+  }
+
+  static String _pesanError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-credential':
+      case 'user-not-found':
+      case 'wrong-password':
+        return 'Email atau password salah.';
+      case 'email-already-in-use':
+        return 'Email sudah terdaftar.';
+      case 'invalid-email':
+        return 'Format email tidak valid.';
+      case 'weak-password':
+        return 'Password terlalu lemah. Gunakan minimal 6 karakter.';
+      case 'network-request-failed':
+        return 'Tidak ada koneksi internet.';
+      case 'too-many-requests':
+        return 'Terlalu banyak percobaan. Coba lagi nanti.';
+      case 'operation-not-allowed':
+        return 'Login Email/Password belum diaktifkan di Firebase.';
+      default:
+        return e.message ?? 'Terjadi kesalahan (${e.code}).';
     }
   }
 }
