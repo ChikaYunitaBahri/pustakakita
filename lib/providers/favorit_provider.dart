@@ -1,9 +1,10 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
 import '../models/buku.dart';
 
+/// Menyimpan daftar buku favorit di Hive.
+/// Buku disimpan sebagai Map (lewat Buku.toMap) dengan id buku sebagai key.
 class FavoritProvider extends ChangeNotifier {
   final dynamic _box;
 
@@ -23,5 +24,10 @@ class FavoritProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Buku> get semua => _box.values.whereType<Buku>().toList();
+  /// Semua buku favorit. Data di Hive berupa Map, jadi diubah kembali
+  /// menjadi objek Buku. Dipakai oleh halaman Favorit dan badge di tab.
+  List<Buku> get semua => _box.values
+      .whereType<Map>()
+      .map((m) => Buku.fromMap(m))
+      .toList();
 }
